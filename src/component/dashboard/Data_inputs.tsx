@@ -544,7 +544,7 @@ const Data_Inputs: React.FC = () => {
 		}
 
 		setLoading(true);
-		axios.post("http://localhost:7000/upload", formData)
+		axios.post("https://id-me-server.onrender.com/upload", formData)
 			.then((response) => {
 				if (response.status === 200) {
 					setLoading(false);
