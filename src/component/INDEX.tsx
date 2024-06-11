@@ -65,7 +65,7 @@ const LandingPage: React.FC = () => {
 				</p>
 				<div className='flex justify-center'>
 					<Link
-						to='/register'
+						to='/signup'
 						className='bg-primary text-white orbitron py-2 px-6 rounded-lg l mr-4 hover:bg-secondary transition duration-300'
 					>
 						Sign Up
