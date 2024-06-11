@@ -5,16 +5,25 @@ const UserProfile: React.FC<{
 	user: {
 		name: string;
 		email: string;
-		profilePicture?: string;
-		dob?: string;
-		location?: string;
-		phone?: string;
-		bio?: string;
-		website?: string;
-		twitter?: string;
-		linkedin?: string;
-		occupation?: string;
-		education?: string;
+		profilePicture?: string | undefined;
+		dob?: string | undefined;
+		location?: string | undefined;
+		phone?: string | undefined;
+		bio?: string | undefined;
+		website?: string | undefined;
+		twitter?: string | undefined;
+		linkedin?: string | undefined;
+		occupation?: string | undefined;
+		education?: string | undefined;
+		citizenship?: string;
+		firstName?: string;
+		lastName?: string;
+		address?: string;
+		phoneNumber?: string;
+		ssn?: string;
+		iban?: string;
+		verificationState?: "passed" | "failed" | "pending";
+		termsAndConditions?: boolean;
 	};
 }> = ({ user }) => {
 	return (
@@ -47,7 +56,7 @@ const UserProfile: React.FC<{
 			</div>
 			<div className='flex items-center mb-2'>
 				<FaPhone className='text-gray-400 mr-2' />
-				<p className='text-sm text-gray-500'>{user.phone || "Phone number not provided"}</p>
+				<p className='text-sm text-gray-500'>{user.phoneNumber || "Phone number not provided"}</p>
 			</div>
 			<div className='flex items-center mb-2'>
 				<FaEnvelope className='text-gray-400 mr-2' />
@@ -97,6 +106,28 @@ const UserProfile: React.FC<{
 				>
 					{user.linkedin || "LinkedIn not provided"}
 				</a>
+			</div>
+			{(user.citizenship === "USA" || user.citizenship === "Germany") && (
+				<div className='flex items-center mb-2'>
+					<FaUser className='text-gray-400 mr-2' />
+					<p className='text-sm text-gray-500'>
+						{user.ssn
+							? `SSN: ${user.ssn}`
+							: user.iban
+							? `IBAN: ${user.iban}`
+							: "SSN or IBAN not provided"}
+					</p>
+				</div>
+			)}
+			<div className='flex items-center mb-2'>
+				<FaUser className='text-gray-400 mr-2' />
+				<p className='text-sm text-gray-500'>Verification State: {user.verificationState}</p>
+			</div>
+			<div className='flex items-center mb-2'>
+				<FaUser className='text-gray-400 mr-2' />
+				<p className='text-sm text-gray-500'>
+					Terms and Conditions: {user.termsAndConditions ? "Accepted" : "Not Accepted"}
+				</p>
 			</div>
 		</div>
 	);

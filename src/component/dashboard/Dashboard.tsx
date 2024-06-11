@@ -6,7 +6,7 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 
 const Dashboard = () => {
 	const path = useLocation().pathname;
-	const outletsRoutes = ["/dashboard/notification", "dashboard/profile", "/dashbord", "/dashboard/Verification"];
+	const outletsRoutes = ["/dashboard/notification", "/dashboard/profile", "/dashbord", "/dashboard/Verification"];
 	return (
 		<div className={`flex  gap-6 bg-neutral-100 max-w-full w-[100%] `}>
 			<Sidebar />
@@ -33,11 +33,11 @@ export const WelcomePage: React.FC = () => {
 			</h2>
 			<p className='text-lg text-center text-gray-700 mb-8'>
 				Explore the power of your dashboard and take control of your data like never before. With
-				intuitive features and seamless navigation, managing your tasks and projects has never been
-				easier.
+				intuitive features and seamless navigation, get your self{" "}
+				<span className={`text-xl rounded-lg animate-pulse bg-lime-950 p-2 relative border-black shadow-lg top-1rem] my-3 text-white`}>verified and certified  .</span>
 			</p>
 			<p className='text-lg text-center text-gray-700'>
-				Need assistance? Check out our{" "}
+				Need assistance? Check out our
 				<a href='/help' className='text-blue-600 hover:underline'>
 					help section
 				</a>{" "}
