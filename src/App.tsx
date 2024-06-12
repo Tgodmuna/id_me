@@ -7,12 +7,12 @@ import UserProfile from "./component/dashboard/Profile";
 import Data_Inputs from "./component/dashboard/Data_inputs";
 import Notification from "./component/dashboard/Notification";
 import OtpVerification from "./component/auth/OTPverification";
-import Authenticator from "./component/auth/Authenticator";
 import AdminDashboard from "./component/Admin/AdminDashboard";
 import UserTable from "./component/Admin/User";
 import EmailForm from "./component/Admin/SendEmail";
 import NotificationForm from "./component/Admin/Send-notification";
 import UserManagement from "./component/Admin/ManageUsers";
+import Dashboard from "./component/dashboard/Dashboard.js";
 
 function App() {
 	let parsedUserDetails;
@@ -30,7 +30,7 @@ function App() {
 				<Route path='/signup' element={<SignUp />} />
 				<Route path='/otp-verification' element={<OtpVerification />} />
 				{/* dashboard */}
-				<Route path='/dashboard' element={<Authenticator />}>
+				<Route path='/dashboard' element={sessionStorage.getItem("token") ? <Dashboard /> : <LogIn />}>
 					<Route
 						path='/dashboard/profile'
 						element={

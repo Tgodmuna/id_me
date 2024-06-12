@@ -3,11 +3,29 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 
 // types.ts
+export interface Media {
+	data: { [key: string]: any };
+	contentType: string;
+}
+
 export interface User {
-	id: number;
-	name: string;
+	UserFullName: string;
+	address: string;
+	citizenship: string;
+	dob: string;
+	document: Media | null;
 	email: string;
+	firstName: string;
+	iban: string | null;
+	image: Media | null;
+	lastName: string;
+	phoneNumber: string;
+	ssn: string | null;
+	userID: string;
 	verified: boolean;
+	video: Media | null;
+	__v: number;
+	_id: string;
 }
 
 export interface ErrorState {
@@ -22,7 +40,7 @@ const useFetchUsers = () => {
 	useEffect(() => {
 		const fetchUsers = async () => {
 			try {
-				const response = await axios.get("https://id-me-server.onrender.com/users");
+				const response = await axios.get("http://localhost:7000/users");
 				setUsers(response.data);
 			} catch (err: any) {
 				setError({ message: err.message });

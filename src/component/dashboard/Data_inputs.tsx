@@ -544,14 +544,14 @@ const Data_Inputs: React.FC = () => {
 		}
 
 		setLoading(true);
-		axios.post("https://id-me-server.onrender.com/upload", formData)
+		axios.post("http://localhost:7000/upload", formData)
 			.then((response) => {
 				if (response.status === 200) {
 					setLoading(false);
 					console.log("Files uploaded successfully", response.data);
 					setSuccess(true);
 					setshowMessage(true);
-					setShowCongratulations(true); // Show congratulations card
+					setShowCongratulations(true);
 				}
 			})
 			.catch((err) => {

@@ -23,20 +23,21 @@ const LogIn: React.FC<{ extractor?: (token: string) => void }> = ({ extractor })
 		setIsLoading(true);
 
 		try {
-			const response = await axios.post("https://id-me-server.onrender.com/login", { email, password });
+			const response = await axios.post("http://localhost:7000/login", { email, password });
 
 			if (response.status === 200) {
 				setEmail("");
 				setPassword("");
+				sessionStorage.setItem("token", response.data.token);
 				if (extractor) {
 					extractor(response.data.token);
 				}
-				setSuccess("User logged in successfully!");
-				const UserDetails = JSON.stringify(response.data.user);
-				sessionStorage.setItem("userDetails", UserDetails);
 				setTimeout(() => {
 					navigate("/dashboard");
 				}, 2000);
+				setSuccess("User logged in successfully!");
+				const UserDetails = JSON.stringify(response.data.user);
+				sessionStorage.setItem("userDetails", UserDetails);
 			}
 		} catch (err: any) {
 			if (err.response && err.response.data && err.response.data.message) {

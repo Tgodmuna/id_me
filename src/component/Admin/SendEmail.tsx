@@ -22,7 +22,9 @@ const EmailForm: React.FC = () => {
 				subject,
 				message,
 			});
-			const response = await axios.post(" https://id-me-server.onrender.com/send-email", data);
+
+			console.log(data);
+			const response = await axios.post(" http://localhost:7000/send-email", data);
 
 			if (response.status === 200) {
 				setSuccess("Email sent successfully!");

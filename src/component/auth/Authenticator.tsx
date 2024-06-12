@@ -2,12 +2,14 @@ import React, { useEffect, useState } from "react";
 import GenericNotification from "./Notification";
 import Dashboard from "../dashboard/Dashboard";
 import LogIn from "./Sign-in";
+import { useNavigate } from "react-router-dom";
 
 const Authenticator: React.FC = () => {
 	// State to manage whether to show the warning
 	const [showWarning, setShowWarning] = React.useState(false);
 	const [isAuthenticated, setisAuthenticated] = useState(false);
 	const [Token, setToken] = useState<string>("");
+	const navigate = useNavigate();
 	// const [showMessage, setShowMessage] = React.useState(false);
 
 	const tokenExtractor = (token: string) => {
@@ -26,6 +28,10 @@ const Authenticator: React.FC = () => {
 			setShowWarning(false);
 		}
 	}, [Token, isAuthenticated]);
+
+	if (Token && isAuthenticated) {
+		navigate("/dashboard");
+	}
 
 	// If user is not authenticated, show warning and login form
 	if (!Token && !isAuthenticated) {

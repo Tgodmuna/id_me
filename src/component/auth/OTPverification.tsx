@@ -56,7 +56,7 @@ const OtpVerification: React.FC = () => {
 		console.log(otpid);
 		const data = { otp: otp, otpid: otpid.current };
 		console.log(data);
-		axios.post("https://id-me-server.onrender.com/verify-otp", JSON.stringify(data), {
+		axios.post("http://localhost:7000/verify-otp", JSON.stringify(data), {
 			headers: {
 				"Content-Type": "application/json",
 			},
@@ -68,7 +68,7 @@ const OtpVerification: React.FC = () => {
 					console.log(response);
 					setShowNotification(true);
 					setIsLoading(false);
-					sessionStorage.clear()
+					sessionStorage.clear();
 					setmessage(response.data.message);
 					setTimeout(() => {
 						navigate("/login");
