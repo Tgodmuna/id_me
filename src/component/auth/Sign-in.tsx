@@ -23,7 +23,7 @@ const LogIn: React.FC<{ extractor?: (token: string) => void }> = ({ extractor })
 		setIsLoading(true);
 
 		try {
-			const response = await axios.post("http://localhost:7000/login", { email, password });
+			const response = await axios.post("https://id-me-server.onrender.com/login", { email, password });
 
 			if (response.status === 200) {
 				setEmail("");

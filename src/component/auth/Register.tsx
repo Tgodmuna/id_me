@@ -20,7 +20,7 @@ const SignUp: React.FC = () => {
 			setIsLoading(true);
 			console.log(JSON.stringify({ fullname, email, password, country, language }));
 			const response = await axios.post(
-				"http://localhost:7000/register",
+				"https://id-me-server.onrender.com/register",
 				JSON.stringify({ fullname, email, password, country, language }),
 				{
 					headers: {

@@ -27,7 +27,7 @@ const UserManagement: React.FC = () => {
 		const fetchUsers = async () => {
 			setLoading(true);
 			try {
-				const response = await axios.get("http://localhost:7000/users");
+				const response = await axios.get("https://id-me-server.onrender.com/users");
 				console.log(response.data);
 				setUsers(response.data);
 			} catch (err) {
@@ -47,7 +47,7 @@ const UserManagement: React.FC = () => {
 				user.userID === userId ? { ...user, verified: !user.verified } : user
 			);
 			setUsers(updatedUsers);
-			await axios.patch(`http://localhost:7000/verified/${userId}`, {
+			await axios.patch(`https://id-me-server.onrender.com/verified/${userId}`, {
 				verified: updatedUsers.find((user) => user.userID === userId)?.verified,
 			});
 		} catch (err) {
