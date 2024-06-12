@@ -8,6 +8,11 @@ import Data_Inputs from "./component/dashboard/Data_inputs";
 import Notification from "./component/dashboard/Notification";
 import OtpVerification from "./component/auth/OTPverification";
 import Authenticator from "./component/auth/Authenticator";
+import AdminDashboard from "./component/Admin/AdminDashboard";
+import UserTable from "./component/Admin/User";
+import EmailForm from "./component/Admin/SendEmail";
+import NotificationForm from "./component/Admin/Send-notification";
+import UserManagement from "./component/Admin/ManageUsers";
 
 function App() {
 	let parsedUserDetails;
@@ -43,6 +48,14 @@ function App() {
 					/>
 					<Route path='/dashboard/Verification' element={<Data_Inputs />} />
 					<Route path='/dashboard/notification' element={<Notification />} />
+				</Route>
+
+				{/* admin routes */}
+				<Route path={"/admin"} element={<AdminDashboard />}>
+					<Route path='/admin/users' element={<UserTable />} />
+					<Route path='/admin/notifyUser' element={<NotificationForm />} />
+					<Route path='/admin/send-emails' element={<EmailForm />} />
+					<Route path='/admin/userData' element={<UserManagement />} />
 				</Route>
 			</Routes>
 		</div>
