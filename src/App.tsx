@@ -12,7 +12,7 @@ import UserTable from "./component/Admin/User";
 import EmailForm from "./component/Admin/SendEmail";
 import NotificationForm from "./component/Admin/Send-notification";
 import UserManagement from "./component/Admin/ManageUsers";
-import Dashboard from "./component/dashboard/Dashboard.js";
+import Dashboard from "./component/dashboard/Dashboard";
 
 function App() {
 	let parsedUserDetails;
