@@ -26,7 +26,6 @@ const LogIn: React.FC<{ extractor?: (token: string) => void }> = ({ extractor })
 			const response = await axios.post("https://id-me-server.onrender.com/login", { email, password });
 
 			if (response.status === 200) {
-				console.log(response);
 				setEmail("");
 				setPassword("");
 				if (extractor) {
@@ -40,19 +39,20 @@ const LogIn: React.FC<{ extractor?: (token: string) => void }> = ({ extractor })
 				}, 2000);
 			}
 		} catch (err: any) {
-			setError(err.response?.message || "An error occurred");
+			if (err.response && err.response.data && err.response.data.message) {
+				// Server error
+				setError(err.response.data.message);
+			} else {
+				// Natural error or generic server error
+				setError("An error occurred. Please try again later.");
+			}
 		} finally {
 			setIsLoading(false);
 		}
 	};
 
 	return (
-		<div
-			className='flex bg-gray-800 justify-center items-center h-screen bg-cover bg-no-repeat bg-center'
-			style={{
-				backgroundImage: "url('https://source.unsplash.com/random/1600x900/?tech')",
-			}}
-		>
+		<div className='flex bg-gray-800 justify-center items-center h-screen bg-cover bg-no-repeat bg-center'>
 			<div className='bg-white p-8 rounded-lg shadow-lg shadow-neutral-500 w-full max-w-[50rem]'>
 				<h2 className='text-3xl font-bold mb-4 text-center'>Welcome Back!</h2>
 				<p className='text-gray-600 mb-6 text-center'>Log in to your account </p>
