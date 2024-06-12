@@ -96,13 +96,13 @@ const SignUp: React.FC = () => {
 
 	return (
 		<div
-			className='flex w-full bg-gray-800 justify-center items-center h-screen bg-cover bg-no-repeat bg-center'
+			className='flex w-full bg-gray-800 p-4 justify-center items-center h-screen bg-cover bg-no-repeat bg-center'
 			style={{
 				backgroundImage: "url('https://source.unsplash.com/random/1600x900/?nature')",
 			}}
 		>
 			<div className='bg-white p-8 rounded-lg sha shadow-lg shadow-neutral-400 w-full max-w-[50rem]'>
-				<h2 className='text-3xl capitalize font-bold mb-4 text-center'>
+				<h2 className='md:text-3xl text-2xl capitalize font-bold mb-4 text-center'>
 					verify me across every system!
 				</h2>
 				<p className='text-gray-600 mb-6 text-center'>Create an account</p>
