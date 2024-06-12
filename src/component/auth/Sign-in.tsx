@@ -29,8 +29,7 @@ const LogIn: React.FC<{ extractor?: (token: string) => void }> = ({ extractor })
 				console.log(response);
 				setEmail("");
 				setPassword("");
-				if ( extractor )
-				{
+				if (extractor) {
 					extractor(response.data.token);
 				}
 				setSuccess("User logged in successfully!");
