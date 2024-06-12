@@ -32,3 +32,23 @@
 ::-webkit-scrollbar-thumb:hover {
 	background-color: #555;
 }
+
+/* styles.css */
+.loading {
+  color: #4a90e2; /* Light blue */
+  font-size: 1.2rem;
+  font-weight: bold;
+  padding: 10px;
+  text-align: center;
+}
+
+.error {
+  color: #e74c3c; /* Red */
+  font-size: 1.2rem;
+  font-weight: bold;
+  padding: 10px;
+  text-align: center;
+  background-color: #fdecea;
+  border: 1px solid #e74c3c;
+  border-radius: 5px;
+}
