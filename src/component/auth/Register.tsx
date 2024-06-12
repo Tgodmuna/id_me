@@ -103,7 +103,7 @@ const SignUp: React.FC = () => {
 		>
 			<div className='bg-white p-8 rounded-lg sha shadow-lg shadow-neutral-400 w-full max-w-[50rem]'>
 				<h2 className='text-3xl capitalize font-bold mb-4 text-center'>
-					verify yourself across every system!
+					verify me across every system!
 				</h2>
 				<p className='text-gray-600 mb-6 text-center'>Create an account</p>
 				<form onSubmit={handleSubmit}>
