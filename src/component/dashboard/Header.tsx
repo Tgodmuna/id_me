@@ -1,11 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { FaUserCircle, FaBell } from "react-icons/fa";
+import { FaUserCircle, FaBell, FaBars } from "react-icons/fa";
 
-const Header: React.FC = () => {
+const Header: React.FC<{ ToggleSidebar: () => void }> = ({ ToggleSidebar }) => {
 	return (
 		<header className='bg-inherit shadow-gray-500 rounded-xl p-4 shadow-md'>
 			<div className='container mx-auto flex justify-between items-center'>
+				<FaBars onClick={() => ToggleSidebar()} className={`text-3xl md:hidden block text-gray-800`} />
 				<h1 className=' text-4xl orbitron text-gray-800 font-bold'>Dashboard</h1>
 				<nav>
 					<ul className='flex space-x-4 text-white'>

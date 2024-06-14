@@ -1,14 +1,19 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { FaHome, FaUser, FaSignOutAlt, FaBell } from "react-icons/fa";
+import { FaHome, FaUser, FaSignOutAlt, FaBell, FaTimes } from "react-icons/fa";
 import Logo from "../Logo";
 
-const Sidebar: React.FC = () => {
+const Sidebar: React.FC<{ toggleSideBar: boolean; hideSidebar: () => void }> = ({ toggleSideBar, hideSidebar }) => {
 	const location = useLocation();
 
 	return (
-		<aside className='bg-gray-800 text-gray-100 h-screen mr-3 fixed w-[20rem] flex flex-col justify-between shadow-xl shadow-black '>
+		<aside
+			className={`bg-gray-800 ${
+				toggleSideBar ? " flex" : "hidden"
+			}  z-50 text-gray-100 h-screen mr-3 fixed w-[20rem] md:flex flex-col justify-between shadow-xl shadow-black `}
+		>
 			<div className='p-4 flex flex-col items-start gap-[4rem] h-[57rem]'>
+				<FaTimes className={`text-3xl text-white hover:scale-90 mr-2`} onClick={hideSidebar} />
 				<h2 className='text-2xl font-bold'>Dashboard</h2>
 				<ul className='mt-4 flex flex-col gap-[2rem] bg- w-full h-[45rem]'>
 					<li
