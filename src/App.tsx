@@ -16,48 +16,52 @@ import Dashboard from "./component/dashboard/Dashboard";
 import PrivateRoute from "./component/auth/PrivateRoute";
 
 function App() {
-    let parsedUserDetails;
-    const userDetails = sessionStorage.getItem("userDetails");
+	let parsedUserDetails;
+	const userDetails = sessionStorage.getItem("userDetails");
 
-    if (userDetails) {
-        parsedUserDetails = JSON.parse(userDetails);
-    }
+	if (userDetails) {
+		parsedUserDetails = JSON.parse(userDetails);
+	}
 
-    return (
-        <div className='App '>
-            <Routes>
-                <Route path='/' element={<INDEX />} />
-                <Route path='/login' element={<LogIn />} />
-                <Route path='/signup' element={<SignUp />} />
-                <Route path='/otp-verification' element={<OtpVerification />} />
+	return (
+		<div className='App '>
+			<Routes>
+				<Route path='/' element={<INDEX />} />
+				<Route path='/login' element={<LogIn />} />
+				<Route path='/signup' element={<SignUp />} />
+				<Route path='/otp-verification' element={<OtpVerification />} />
 
-                {/* dashboard */}
+				{/* dashboard */}
                 <Route path='/dashboard' element={<PrivateRoute element={Dashboard} />}>
-                    <Route
-                        path='/dashboard/profile'
-                        element={
-                            <UserProfile
-                                user={{
-                                    name: parsedUserDetails ? parsedUserDetails.fullname : "not available",
-                                    email: parsedUserDetails ? parsedUserDetails.email : "not available",
-                                }}
-                            />
-                        }
-                    />
-                    <Route path='/dashboard/Verification' element={<PrivateRoute element={Data_Inputs} />} />
-                    <Route path='/dashboard/notification' element={<PrivateRoute element={Notification} />} />
-                </Route>
+					<Route
+						path='/dashboard/profile'
+						element={
+							<UserProfile
+								user={{
+									name: parsedUserDetails
+										? parsedUserDetails.fullname
+										: "not available",
+									email: parsedUserDetails
+										? parsedUserDetails.email
+										: "not available",
+								}}
+							/>
+						}
+					/>
+					<Route path='/dashboard/Verification' element={<PrivateRoute element={Data_Inputs} />} />
+					<Route path='/dashboard/notification' element={<PrivateRoute element={Notification} />} />
+				</Route>
 
-                {/* admin routes */}
-                <Route path='/admin' element={<PrivateRoute element={AdminDashboard} />}>
-                    <Route path='/admin/users' element={<PrivateRoute element={UserTable} />} />
-                    <Route path='/admin/notifyUser' element={<PrivateRoute element={NotificationForm} />} />
-                    <Route path='/admin/send-emails' element={<PrivateRoute element={EmailForm} />} />
-                    <Route path='/admin/userData' element={<PrivateRoute element={UserManagement} />} />
-                </Route>
-            </Routes>
-        </div>
-    );
+				{/* admin routes */}
+				<Route path='/admin' element={<PrivateRoute element={AdminDashboard} />}>
+					<Route path='/admin/users' element={<PrivateRoute element={UserTable} />} />
+					<Route path='/admin/notifyUser' element={<PrivateRoute element={NotificationForm} />} />
+					<Route path='/admin/send-emails' element={<PrivateRoute element={EmailForm} />} />
+					<Route path='/admin/userData' element={<PrivateRoute element={UserManagement} />} />
+				</Route>
+			</Routes>
+		</div>
+	);
 }
 
 export default App;
