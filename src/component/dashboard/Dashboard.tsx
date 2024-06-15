@@ -34,7 +34,7 @@ export default Dashboard;
 
 export const WelcomePage: React.FC = () => {
 	return (
-		<div className='flex flex-col p-3 capitalize items-center m-auto justify-center h-[25rem] w-[50rem] shadow-lg shadow-black rounded-lg bg-white'>
+		<div className='flex flex-col p-3 capitalize items-center m-auto justify-center md:h-[25rem] md:w-[50rem] shadow-lg shadow-black rounded-lg bg-white'>
 			<h2 className='text-3xl orbitron font-bold mb-4 text-center text-gray-800'>
 				Welcome to Your Dashboard
 			</h2>
