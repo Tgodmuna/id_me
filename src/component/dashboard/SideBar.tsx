@@ -13,7 +13,7 @@ const Sidebar: React.FC<{ toggleSideBar: boolean; hideSidebar: () => void }> = (
 			}  z-50 text-gray-100 h-screen mr-3 fixed w-[20rem] md:flex flex-col justify-between shadow-xl shadow-black `}
 		>
 			<div className='p-4 flex flex-col items-start gap-[4rem] h-[57rem]'>
-				<FaTimes className={`text-3xl text-white hover:scale-90 mr-2`} onClick={hideSidebar} />
+				<FaTimes className={`text-3xl md:hidden text-white hover:scale-90 mr-2`} onClick={hideSidebar} />
 				<h2 className='text-2xl font-bold'>Dashboard</h2>
 				<ul className='mt-4 flex flex-col gap-[2rem] bg- w-full h-[45rem]'>
 					<li
