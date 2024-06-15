@@ -6,7 +6,7 @@ const Header: React.FC<{ ToggleSidebar: () => void }> = ({ ToggleSidebar }) => {
 	return (
 		<header className='bg-inherit shadow-gray-500 rounded-xl p-4 shadow-md'>
 			<div className='container mx-auto flex justify-between items-center'>
-				<FaBars onClick={() => ToggleSidebar()} className={`text-3xl md:hidden block text-gray-800`} />
+				<FaBars onClick={() => ToggleSidebar()} className={`text-5xl md:hidden block text-gray-800`} />
 				<Link to={"/dashboard"} className=' text-4xl orbitron text-gray-800 font-bold'>
 					Dashboard
 				</Link>

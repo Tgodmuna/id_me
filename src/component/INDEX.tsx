@@ -4,7 +4,7 @@ import Logo from "./Logo";
 
 const INDEX = () => {
 	return (
-		<div about={"Landing page for the Verificationboard app."}>
+		<div className={`flex flex-col max-w-full`} about={"Landing page for the Verificationboard app."}>
 			<Header />
 			<LandingPage />
 			<Footer />
@@ -16,11 +16,13 @@ export default INDEX;
 
 const Header: React.FC = () => {
 	return (
-		<header className='bg-gray-800  mx-auto flex justify-between items-center  text-white p-4 shadow-md w-full max-w-full'>
+		<header className='bg-gray-800  mx-auto flex md:justify-between sm:justify-between gap-5 items-center  text-white p-4 shadow-md w-full max-w-full'>
 			<Link to='/' className='flex items-center bg'>
 				<Logo />
 			</Link>
-			<div>
+			<div
+				className={` text-sm m-1 flex flex-nowrap sm:overscroll-none overflow-auto overflow-y-hidden w-auto`}
+			>
 				<Link to='/' className='mr-4 hover:underline'>
 					Home
 				</Link>
@@ -31,7 +33,7 @@ const Header: React.FC = () => {
 					Login
 				</Link>
 				<Link to='/register' className='hover:underline'>
-					Sign Up
+					SignUp
 				</Link>
 			</div>
 		</header>
@@ -40,17 +42,20 @@ const Header: React.FC = () => {
 
 const Footer: React.FC = () => {
 	return (
-		<footer className='bg-gray-800 text-white p-4 mt-auto'>
-			<div className='container mx-auto text-center'>
+		<footer className='bg-gray-800 text-white p-4 mt-auto flex justify-between items-center'>
+			<div className='container mx-auto text-center flex'>
 				&copy; 2023 User Data Collection. All rights reserved.
 			</div>
+			<Link className={`text-sm capitalize hover:text-blue-300 cursor-pointer`} to={`/tc`}>
+				Terms and Conditions
+			</Link>
 		</footer>
 	);
 };
 
 const LandingPage: React.FC = () => {
 	return (
-		<div className='flex flex-col items-center justify-center min-h-screen bg-light text-dark'>
+		<div className='flex flex-col items-center justify-center min-h-screen bg-light text-dark m-2'>
 			<div className='max-w-2xl text-center p-6 bg-gray-800 shadow-lg rounded-lg'>
 				<h1 className='md:text-5xl text-3xl font-bold text-white mb-6 dancing-script '>
 					Welcome to Verificationboard
