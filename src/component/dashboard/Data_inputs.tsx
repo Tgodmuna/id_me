@@ -26,6 +26,7 @@ const Data_Inputs: React.FC = () => {
 	const recordedChunksRef = useRef<Blob[]>([]);
 	const [, setshowMessage] = useState(false);
 	const [ showCongratulations, setShowCongratulations ] = useState( false );
+	const FormREF=useRef<HTMLFormElement>(null)
 	
 
 	const handleCitizenshipChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -118,6 +119,24 @@ const Data_Inputs: React.FC = () => {
 		return true;
 	};
 
+	const resetForm = () => {
+		if (FormREF.current) {
+			FormREF.current.reset();
+		}
+		setCitizenship("");
+		setShowFaceCapture(false);
+		setShowSSN(false);
+		setShowIBAN(false);
+		setVideoURL(null);
+		setImageURL(null);
+		setPhoneError(null);
+		setSSNError(null);
+		setIBANError(null);
+		setSuccess(false);
+		setError(false);
+	};
+
+
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		const formData = new FormData(e.target as HTMLFormElement);
@@ -154,7 +173,8 @@ const Data_Inputs: React.FC = () => {
 					console.log("Files uploaded successfully", response.data);
 					setSuccess(true);
 					setshowMessage(true);
-					setShowCongratulations(true);
+					setShowCongratulations( true );
+					resetForm()
 				}
 			})
 			.catch((err) => {
@@ -171,6 +191,7 @@ const Data_Inputs: React.FC = () => {
 
 	return (
 		<form
+			ref={FormREF}
 			className='bg-white m-auto my-6 mx-4 h-full relative rounded-lg shadow-lg p-6'
 			onSubmit={handleSubmit}
 		>
