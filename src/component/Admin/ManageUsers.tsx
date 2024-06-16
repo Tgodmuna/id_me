@@ -27,7 +27,10 @@ const UserManagement: React.FC = () => {
 		const fetchUsers = async () => {
 			setLoading(true);
 			try {
-				const response = await axios.get("https://id-me-server.onrender.com/users");
+				const response = await axios.get( "https://id-me-server.onrender.com/users", {
+					headers: {
+					"Content-Type":'application/json'
+				}});
 				console.log(response.data);
 				setUsers(response.data);
 			} catch (err) {

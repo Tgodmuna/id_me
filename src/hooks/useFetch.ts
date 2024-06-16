@@ -40,7 +40,11 @@ const useFetchUsers = () => {
 	useEffect(() => {
 		const fetchUsers = async () => {
 			try {
-				const response = await axios.get("https://id-me-server.onrender.com/users");
+				const response = await axios.get("https://id-me-server.onrender.com/users", {
+					headers: {
+						"Content-Type": "application/json",
+					},
+				});
 				setUsers(response.data);
 			} catch (err: any) {
 				setError({ message: err.message });
