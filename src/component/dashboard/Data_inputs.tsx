@@ -1,18 +1,16 @@
 import { isValidPhoneNumber, CountryCode } from "libphonenumber-js";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import IBAN from "iban";
 import axios from "axios";
 import CongratulationsCard from "./CongratulationCard";
 import { Countrie, countryCodeMap } from "../../hooks/Country";
-
-
+import Webcam from "react-webcam";
 
 const Data_Inputs: React.FC = () => {
 	const [citizenship, setCitizenship] = useState("");
 	const [showFaceCapture, setShowFaceCapture] = useState(false);
 	const [showSSN, setShowSSN] = useState(false);
 	const [showIBAN, setShowIBAN] = useState(false);
-	const [recording, setRecording] = useState(false);
 	const [videoURL, setVideoURL] = useState<string | null>(null);
 	const [imageURL, setImageURL] = useState<string | null>(null);
 	const [phoneError, setPhoneError] = useState<string | null>(null);
@@ -21,13 +19,18 @@ const Data_Inputs: React.FC = () => {
 	const [loading, setLoading] = useState(false);
 	const [success, setSuccess] = useState(false);
 	const [error, setError] = useState(false);
-	const videoRef = useRef<HTMLVideoElement>(null);
 	const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-	const recordedChunksRef = useRef<Blob[]>([]);
 	const [, setshowMessage] = useState(false);
-	const [ showCongratulations, setShowCongratulations ] = useState( false );
-	const FormREF=useRef<HTMLFormElement>(null)
-	
+	const [showCongratulations, setShowCongratulations] = useState(false);
+	const FormREF = useRef<HTMLFormElement>(null);
+	const [imageCameraOn, setImageCameraOn] = useState<boolean>(false);
+	const [videoCameraOn, setVideoCameraOn] = useState<boolean>(false);
+	const [imageSrc, setImageSrc] = useState<string | null>(null);
+	const [videoSrc, setVideoSrc] = useState<string | null>(null);
+	const [capturing, setCapturing] = useState<boolean>(false);
+	const imageWebcamRef = useRef<Webcam>(null);
+	const videoWebcamRef = useRef<Webcam>(null);
+	const [recordedChunks, setRecordedChunks] = useState<Blob[]>([]);
 
 	const handleCitizenshipChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
 		const selectedCitizenship = e.target.value;
@@ -35,54 +38,6 @@ const Data_Inputs: React.FC = () => {
 		setShowSSN(selectedCitizenship === "United States");
 		setShowIBAN(selectedCitizenship === "Germany");
 		setShowFaceCapture(selectedCitizenship === "United States");
-	};
-
-	const handleStartRecording = async () => {
-		if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-			const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-			if (videoRef.current) {
-				videoRef.current.srcObject = stream;
-				videoRef.current.play();
-			}
-			mediaRecorderRef.current = new MediaRecorder(stream);
-			mediaRecorderRef.current.ondataavailable = (event) => {
-				if (event.data.size > 0) {
-					recordedChunksRef.current.push(event.data);
-				}
-			};
-			mediaRecorderRef.current.onstop = () => {
-				const blob = new Blob(recordedChunksRef.current, {
-					type: "video/webm",
-				});
-				setVideoURL(URL.createObjectURL(blob));
-				recordedChunksRef.current = [];
-			};
-			mediaRecorderRef.current.start();
-			setRecording(true);
-		}
-	};
-
-	const handleStopRecording = () => {
-		if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
-			mediaRecorderRef.current.stop();
-			setRecording(false);
-		}
-		if (videoRef.current && videoRef.current.srcObject) {
-			(videoRef.current.srcObject as MediaStream).getTracks().forEach((track) => track.stop());
-		}
-	};
-
-	const handleCaptureImage = async () => {
-		if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-			const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-			const track = stream.getVideoTracks()[0];
-			const imageCapture = new (window as any).ImageCapture(track);
-			const photo = await imageCapture.takePhoto();
-			setImageURL(URL.createObjectURL(photo));
-			track.stop();
-		} else {
-			console.error("ImageCapture API is not supported in this browser.");
-		}
 	};
 
 	const validatePhoneNumber = (phoneNumber: string, countryCode: CountryCode) => {
@@ -136,7 +91,6 @@ const Data_Inputs: React.FC = () => {
 		setError(false);
 	};
 
-
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		const formData = new FormData(e.target as HTMLFormElement);
@@ -173,8 +127,8 @@ const Data_Inputs: React.FC = () => {
 					console.log("Files uploaded successfully", response.data);
 					setSuccess(true);
 					setshowMessage(true);
-					setShowCongratulations( true );
-					resetForm()
+					setShowCongratulations(true);
+					resetForm();
 				}
 			})
 			.catch((err) => {
@@ -189,6 +143,81 @@ const Data_Inputs: React.FC = () => {
 		setShowCongratulations(false);
 	};
 
+	//camera capture handlers
+	const handleStartImageCamera = () => {
+		setImageCameraOn(true);
+	};
+
+	const retakeImage = () => {
+		setImageSrc(null);
+		handleStartImageCamera();
+	};
+
+	const handleStopImageCamera = () => {
+		setImageCameraOn(false);
+	};
+
+	const captureImage = useCallback(() => {
+		if (imageWebcamRef.current) {
+			const imageSrc = imageWebcamRef.current.getScreenshot();
+			setImageSrc(imageSrc);
+			handleStopImageCamera();
+		}
+	}, [imageWebcamRef]);
+
+	//video handlers
+	const handleStartVideoCamera = () => {
+		setVideoCameraOn(true);
+	};
+
+	const handleStopVideoCamera = () => {
+		setVideoCameraOn(false);
+	};
+
+	const retakeVideo = () => {
+		setVideoSrc(null);
+		setRecordedChunks([]);
+		handleStartVideoCamera();
+	};
+
+	const handleDownload = useCallback(() => {
+		if (recordedChunks.length) {
+			const blob = new Blob(recordedChunks, {
+				type: "video/webm",
+			});
+			const url = URL.createObjectURL(blob);
+			setVideoSrc(url);
+			setRecordedChunks([]);
+		}
+	}, [recordedChunks]);
+
+	const handleDataAvailable = useCallback(
+		(event: BlobEvent) => {
+			if (event.data.size > 0) {
+				setRecordedChunks((prev) => prev.concat(event.data));
+			}
+		},
+		[setRecordedChunks]
+	);
+
+	const handleStartCaptureClick = useCallback(() => {
+		if (videoWebcamRef.current && videoWebcamRef.current.stream) {
+			setCapturing(true);
+			mediaRecorderRef.current = new MediaRecorder(videoWebcamRef.current.stream, {
+				mimeType: "video/webm",
+			});
+			mediaRecorderRef.current.addEventListener("dataavailable", handleDataAvailable);
+			mediaRecorderRef.current.start();
+		}
+	}, [handleDataAvailable]);
+
+	const handleStopCaptureClick = useCallback(() => {
+		if (mediaRecorderRef.current) {
+			mediaRecorderRef.current.stop();
+			setCapturing(false);
+		}
+	}, [mediaRecorderRef]);
+
 	return (
 		<form
 			ref={FormREF}
@@ -199,6 +228,7 @@ const Data_Inputs: React.FC = () => {
 
 			<h2 className='text-2xl font-semibold mb-6 text-gray-800'>Verification Details</h2>
 			<div className='flex ga flex-wrap h-auto -mx-3'>
+				{/* citizen */}
 				<div className='mb-6 px-3 w-1/2'>
 					<label htmlFor='citizenship' className='block text-sm font-medium text-gray-700 mb-2'>
 						Citizenship
@@ -219,6 +249,8 @@ const Data_Inputs: React.FC = () => {
 						))}
 					</select>
 				</div>
+
+				{/* first name */}
 				<div className='mb-6 px-3 w-1/2'>
 					<label htmlFor='firstName' className='block text-sm font-medium text-gray-700 mb-2'>
 						First Name
@@ -232,6 +264,8 @@ const Data_Inputs: React.FC = () => {
 						required
 					/>
 				</div>
+
+				{/* lastname */}
 				<div className='mb-6 px-3 w-1/2'>
 					<label htmlFor='lastName' className='block text-sm font-medium text-gray-700 mb-2'>
 						Last Name
@@ -245,6 +279,8 @@ const Data_Inputs: React.FC = () => {
 						required
 					/>
 				</div>
+
+				{/* dob */}
 				<div className='mb-6 px-3 w-1/2'>
 					<label htmlFor='dob' className='block text-sm font-medium text-gray-700 mb-2'>
 						Date of Birth
@@ -257,6 +293,8 @@ const Data_Inputs: React.FC = () => {
 						required
 					/>
 				</div>
+
+				{/* address */}
 				<div className='mb-6 px-3 w-1/2'>
 					<label htmlFor='address' className='block text-sm font-medium text-gray-700 mb-2'>
 						Address
@@ -270,6 +308,8 @@ const Data_Inputs: React.FC = () => {
 						required
 					/>
 				</div>
+
+				{/* phone */}
 				<div className='mb-6 px-3 w-1/2'>
 					<label htmlFor='phoneNumber' className='block text-sm font-medium text-gray-700 mb-2'>
 						Phone Number
@@ -284,6 +324,8 @@ const Data_Inputs: React.FC = () => {
 					/>
 					{phoneError && <p className='text-red-500 text-sm mt-2'>{phoneError}</p>}
 				</div>
+
+				{/* ssn */}
 				{showSSN && (
 					<div className='mb-6 px-3 w-1/2'>
 						<label htmlFor='ssn' className='block text-sm font-medium text-gray-700 mb-2'>
@@ -300,6 +342,8 @@ const Data_Inputs: React.FC = () => {
 						{ssnError && <p className='text-red-500 text-sm mt-2'>{ssnError}</p>}
 					</div>
 				)}
+
+				{/* upload */}
 				<div className='mb-6 px-3 w-1/2'>
 					<label htmlFor='document' className='block text-sm font-medium text-gray-700 mb-2'>
 						Upload Document (Driver's License/Passport)
@@ -312,57 +356,133 @@ const Data_Inputs: React.FC = () => {
 						className='w-full border border-gray-300 focus:ring-blue-500 focus:border-blue-500 rounded-md shadow-sm p-2'
 					/>
 				</div>
-				{showFaceCapture && (
-					<div className='mb-6 px-3 w-1/2'>
-						<label htmlFor='face' className='block text-sm font-medium text-gray-700 mb-2'>
-							Face Capture
-						</label>
-						<p className={`text-red-400 text-sm capitalize`}>
-							keep your face closer and direct to the camera to capture well
-						</p>
-						<div className='flex items-center space-x-4'>
-							<button
-								type='button'
-								className='bg-blue-500 text-white px-4 py-2 rounded-md shadow-sm hover:bg-blue-600 transition'
-								onClick={recording ? handleStopRecording : handleStartRecording}
-							>
-								{recording ? "Stop Recording" : "Start Recording"}
-							</button>
-							{videoURL && (
-								<video
-									ref={videoRef}
-									className='w-48 h-48 rounded-md shadow-md'
-									controls
+
+				{/* image and video capturing */}
+				<div className='flex w-full justify-between bg-blue-100 rounded-md m-[1rem] px-[2rem]'>
+					{/* video */}
+					{showFaceCapture && (
+						<div className='flex flex-col items-center'>
+							<p className='text-xl capitalize mb-4'>video record</p>
+							{!videoCameraOn && !videoSrc && !capturing && (
+								<button
+									onClick={handleStartVideoCamera}
+									className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'
 								>
-									<source src={videoURL} type='video/webm' />
-									Your browser does not support the video tag.
-								</video>
+									Start Camera
+								</button>
+							)}
+							{videoCameraOn && !videoSrc && (
+								<div>
+									<Webcam
+										audio={true}
+										ref={videoWebcamRef}
+										screenshotFormat='image/jpeg'
+										width='200'
+										height='150'
+										className='mx-auto'
+									/>
+									<div className='mt-4 flex justify-center'>
+										{capturing ? (
+											<button
+												onClick={handleStopCaptureClick}
+												className='bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mr-2'
+											>
+												Stop Recording
+											</button>
+										) : (
+											<button
+												onClick={handleStartCaptureClick}
+												className='bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2'
+											>
+												Start Recording
+											</button>
+										)}
+										<button
+											onClick={handleStopVideoCamera}
+											className='bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded'
+										>
+											Stop Camera
+										</button>
+									</div>
+								</div>
+							)}
+							{!videoCameraOn && videoSrc && (
+								<div>
+									<h3 className='text-xl font-bold mb-2'>Recorded Video:</h3>
+									<video src={videoSrc} controls className='w-80 h-60' />
+									<div className='mt-4 flex justify-center'>
+										<button
+											onClick={retakeVideo}
+											className='bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded mr-2'
+										>
+											Retake Video
+										</button>
+										<button
+											onClick={handleDownload}
+											className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'
+										>
+											Download Video
+										</button>
+									</div>
+								</div>
 							)}
 						</div>
-					</div>
-				)}
-				<div className='mb-6 px-3 w-1/2'>
-					<label htmlFor='imageCapture' className='block text-sm font-medium text-gray-700 mb-2'>
-						Capture Image
-					</label>
-					<p className={`text-red-400 text-sm capitalize`}>
-						keep your face closer and direct to the camera to capture well
-					</p>
-					<button
-						type='button'
-						className='bg-green-500 text-white px-4 py-2 rounded-md shadow-sm hover:bg-green-600 transition'
-						onClick={handleCaptureImage}
-					>
-						Capture Image
-					</button>
-					{imageURL && (
-						<img
-							src={imageURL}
-							alt='Captured'
-							className='mt-4 w-48 h-48 rounded-md shadow-md'
-						/>
 					)}
+
+					{/* image */}
+					<div className='flex flex-col items-center h-fit mb-[1rem]'>
+						<p className='text-xl capitalize mb-4'>face Capture</p>
+						{!imageCameraOn && !imageSrc && (
+							<button
+								onClick={handleStartImageCamera}
+								className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'
+							>
+								Start Camera
+							</button>
+						)}
+						{imageCameraOn && !imageSrc && (
+							<div>
+								<Webcam
+									audio={false}
+									ref={imageWebcamRef}
+									screenshotFormat='image/jpeg'
+									width='200'
+									height='150'
+									className='mx-auto'
+								/>
+								<div className='mt-4 flex justify-center space-x-4'>
+									<button
+										onClick={captureImage}
+										className='bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded'
+									>
+										CaptureImage
+									</button>
+									<button
+										onClick={handleStopImageCamera}
+										className='bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded'
+									>
+										Stop Camera
+									</button>
+								</div>
+							</div>
+						)}
+						{imageSrc && (
+							<div className='mt-4'>
+								<h3 className='text-xl font-bold mb-2'>Captured Image:</h3>
+								<img src={imageSrc} alt='Captured' className='w-80 h-60 object-cover' />
+								<div className='mt-4'>
+									<button
+										onClick={retakeImage}
+										className='bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded'
+									>
+										Retake Image
+									</button>
+								</div>
+							</div>
+						)}
+					</div>
 				</div>
+
 				{showIBAN && (
 					<div className='mb-6 px-3 w-1/2'>
 						<label htmlFor='iban' className='block text-sm font-medium text-gray-700 mb-2'>
