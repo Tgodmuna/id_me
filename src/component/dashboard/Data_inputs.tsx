@@ -11,8 +11,6 @@ const Data_Inputs: React.FC = () => {
 	const [showFaceCapture, setShowFaceCapture] = useState(false);
 	const [showSSN, setShowSSN] = useState(false);
 	const [showIBAN, setShowIBAN] = useState(false);
-	const [videoURL, setVideoURL] = useState<string | null>(null);
-	const [imageURL, setImageURL] = useState<string | null>(null);
 	const [phoneError, setPhoneError] = useState<string | null>(null);
 	const [ssnError, setSSNError] = useState<string | null>(null);
 	const [ibanError, setIBANError] = useState<string | null>(null);
@@ -31,6 +29,7 @@ const Data_Inputs: React.FC = () => {
 	const imageWebcamRef = useRef<Webcam>(null);
 	const videoWebcamRef = useRef<Webcam>(null);
 	const [recordedChunks, setRecordedChunks] = useState<Blob[]>([]);
+	const [message, setmessage] = useState("");
 
 	const handleCitizenshipChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
 		const selectedCitizenship = e.target.value;
@@ -82,8 +81,8 @@ const Data_Inputs: React.FC = () => {
 		setShowFaceCapture(false);
 		setShowSSN(false);
 		setShowIBAN(false);
-		setVideoURL(null);
-		setImageURL(null);
+		setVideoSrc(null);
+		setImageSrc(null);
 		setPhoneError(null);
 		setSSNError(null);
 		setIBANError(null);
@@ -94,10 +93,15 @@ const Data_Inputs: React.FC = () => {
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		const formData = new FormData(e.target as HTMLFormElement);
+
+		// Ensure form enctype is set correctly
+		if (FormREF.current && FormREF.current.enctype !== "multipart/form-data") {
+			FormREF.current.enctype = "multipart/form-data";
+		}
+
 		const phoneNumber = formData.get("phoneNumber") as string;
 		const ssn = formData.get("ssn") as string;
 		const iban = formData.get("iban") as string;
-
 		const countryCode = countryCodeMap[citizenship];
 
 		const stringifyDetails = sessionStorage.getItem("userDetails");
@@ -108,19 +112,32 @@ const Data_Inputs: React.FC = () => {
 		if (ssn && !validateSSN(ssn)) return;
 		if (iban && !validateIBAN(iban)) return;
 
-		if (videoURL) {
-			const response = await fetch(videoURL);
-			const videoBlob = await response.blob();
-			formData.append("video", videoBlob, "recording.webm");
+		if (imageSrc) {
+			const blob = await (await fetch(imageSrc)).blob();
+			formData.append("image", blob, "capture.jpg");
 		}
-		if (imageURL) {
-			const response = await fetch(imageURL);
-			const imageBlob = await response.blob();
-			formData.append("image", imageBlob, "capture.jpg");
+
+		if (recordedChunks.length) {
+			formData.append("video", recordedChunks[0], "recording.webm");
+		}
+
+		// const documentFile = formData.get("document");
+		// if (documentFile) {
+		// 	formData.append("document", documentFile);
+		// }
+
+		// Logging form data for debugging
+		for (let pair of formData.entries()) {
+			console.log(pair[0] + ": " + pair[1]);
 		}
 
 		setLoading(true);
-		axios.post("https://id-me-server.onrender.com/upload", formData)
+
+		axios.post("https://id-me-server.onrender.com/upload", formData, {
+			headers: {
+				"Content-Type": "multipart/form-data",
+			},
+		})
 			.then((response) => {
 				if (response.status === 200) {
 					setLoading(false);
@@ -136,6 +153,11 @@ const Data_Inputs: React.FC = () => {
 				setError(true);
 				setLoading(false);
 				setshowMessage(false);
+				if (err.response) {
+					setmessage(err.response.data.message);
+				} else {
+					setmessage(err.message);
+				}
 			});
 	};
 
@@ -180,16 +202,16 @@ const Data_Inputs: React.FC = () => {
 		handleStartVideoCamera();
 	};
 
-	const handleDownload = useCallback(() => {
-		if (recordedChunks.length) {
-			const blob = new Blob(recordedChunks, {
-				type: "video/webm",
-			});
-			const url = URL.createObjectURL(blob);
-			setVideoSrc(url);
-			setRecordedChunks([]);
-		}
-	}, [recordedChunks]);
+	// const handleDownload = useCallback(() => {
+	// 	if (recordedChunks.length) {
+	// 		const blob = new Blob(recordedChunks, {
+	// 			type: "video/webm",
+	// 		});
+	// 		const url = URL.createObjectURL(blob);
+	// 		setVideoSrc(url);
+	// 		setRecordedChunks([]);
+	// 	}
+	// }, [recordedChunks]);
 
 	const handleDataAvailable = useCallback(
 		(event: BlobEvent) => {
@@ -215,19 +237,26 @@ const Data_Inputs: React.FC = () => {
 		if (mediaRecorderRef.current) {
 			mediaRecorderRef.current.stop();
 			setCapturing(false);
+			if (recordedChunks.length) {
+				const blob = new Blob(recordedChunks, {
+					type: "video/webm",
+				});
+				setVideoSrc(URL.createObjectURL(blob)); // for preview (optional)
+				setRecordedChunks([blob]); // Convert chunks to a single blob
+			}
 		}
-	}, [mediaRecorderRef]);
+	}, [recordedChunks]);
 
 	return (
 		<form
 			ref={FormREF}
-			className='bg-white m-auto my-6 mx-4 h-full relative rounded-lg shadow-lg p-6'
+			className='bg-white m-auto  pt-4 my-6  md:mx-4 h-[100rem] relative rounded-lg shadow-lg p-6'
 			onSubmit={handleSubmit}
 		>
 			{showCongratulations && <CongratulationsCard onClose={handleCloseCongratulations} />}
 
 			<h2 className='text-2xl font-semibold mb-6 text-gray-800'>Verification Details</h2>
-			<div className='flex ga flex-wrap h-auto -mx-3'>
+			<div className='flex ga flex-wrap h-auto w-full  md:-mx-3'>
 				{/* citizen */}
 				<div className='mb-6 px-3 w-1/2'>
 					<label htmlFor='citizenship' className='block text-sm font-medium text-gray-700 mb-2'>
@@ -358,13 +387,14 @@ const Data_Inputs: React.FC = () => {
 				</div>
 
 				{/* image and video capturing */}
-				<div className='flex w-full justify-between bg-blue-100 rounded-md m-[1rem] px-[2rem]'>
+				<div className='flex w-full flex-wrap md:flex-nowrap justify-between bg-blue-100 rounded-md m-[1rem] px-[2rem]'>
 					{/* video */}
 					{showFaceCapture && (
 						<div className='flex flex-col items-center'>
 							<p className='text-xl capitalize mb-4'>video record</p>
 							{!videoCameraOn && !videoSrc && !capturing && (
 								<button
+									type='button'
 									onClick={handleStartVideoCamera}
 									className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'
 								>
@@ -379,11 +409,13 @@ const Data_Inputs: React.FC = () => {
 										screenshotFormat='image/jpeg'
 										width='200'
 										height='150'
+										name={"video"}
 										className='mx-auto'
 									/>
 									<div className='mt-4 flex justify-center'>
 										{capturing ? (
 											<button
+												type='button'
 												onClick={handleStopCaptureClick}
 												className='bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mr-2'
 											>
@@ -391,6 +423,7 @@ const Data_Inputs: React.FC = () => {
 											</button>
 										) : (
 											<button
+												type='button'
 												onClick={handleStartCaptureClick}
 												className='bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2'
 											>
@@ -398,6 +431,7 @@ const Data_Inputs: React.FC = () => {
 											</button>
 										)}
 										<button
+											type='button'
 											onClick={handleStopVideoCamera}
 											className='bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded'
 										>
@@ -406,22 +440,17 @@ const Data_Inputs: React.FC = () => {
 									</div>
 								</div>
 							)}
-							{!videoCameraOn && videoSrc && (
+							{videoSrc && (
 								<div>
 									<h3 className='text-xl font-bold mb-2'>Recorded Video:</h3>
 									<video src={videoSrc} controls className='w-80 h-60' />
 									<div className='mt-4 flex justify-center'>
 										<button
+											type='button'
 											onClick={retakeVideo}
 											className='bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded mr-2'
 										>
 											Retake Video
-										</button>
-										<button
-											onClick={handleDownload}
-											className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'
-										>
-											Download Video
 										</button>
 									</div>
 								</div>
@@ -448,6 +477,7 @@ const Data_Inputs: React.FC = () => {
 									screenshotFormat='image/jpeg'
 									width='200'
 									height='150'
+									name={"image"}
 									className='mx-auto'
 								/>
 								<div className='mt-4 flex justify-center space-x-4'>
@@ -504,12 +534,16 @@ const Data_Inputs: React.FC = () => {
 						type='submit'
 						className='bg-blue-500 text-white px-6 py-3 rounded-md shadow-sm hover:bg-blue-600 transition w-full'
 					>
-						{loading ? <p>Loading...</p> : "Submit"};
+						{loading ? <p>Loading...</p> : "Submit"}
 					</button>
 				</div>
 			</div>
 			{success && <p style={{ color: "green" }}>Form submitted successfully!</p>}
-			{error && <p style={{ color: "red" }}>There was an error submitting the form.</p>}
+			{error && (
+				<p style={{ color: "red" }}>
+					There was an error submitting the form, <span className={`font-bold text-xl`} >{message}</span>
+				</p>
+			)}
 		</form>
 	);
 };
