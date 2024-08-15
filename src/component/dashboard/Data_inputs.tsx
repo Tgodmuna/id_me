@@ -484,7 +484,7 @@ const Data_Inputs: React.FC = () => {
 									width='1280'
 									height='720'
 									name={ "image" }
-									className='mx-auto'
+									className='mx-auto w-[30rem] '
 									screenshotQuality={ 1 }
 								/>
 								<div className='mt-4 flex justify-center space-x-4'>
