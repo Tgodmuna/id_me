@@ -33,7 +33,7 @@ const UserManagement: React.FC = () => {
 						"Content-Type": 'application/json'
 					}
 				} );
-				console.log( response.data );
+				// console.log( response.data );
 				setUsers( response.data );
 			} catch ( err ) {
 				setError( "Error fetching users. Please try again later." );
