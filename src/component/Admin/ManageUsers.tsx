@@ -16,55 +16,58 @@ interface User {
 	UserFullName: string;
 	userID: string;
 	verified: boolean;
+	_id: string;
 }
 
 const UserManagement: React.FC = () => {
-	const [users, setUsers] = useState<User[]>([]);
-	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState<string | null>(null);
+	const [ users, setUsers ] = useState<User[]>( [] );
+	const [ loading, setLoading ] = useState( false );
+	const [ error, setError ] = useState<string | null>( null );
 
-	useEffect(() => {
+	useEffect( () => {
 		const fetchUsers = async () => {
-			setLoading(true);
+			setLoading( true );
 			try {
 				const response = await axios.get( "https://id-me-server.onrender.com/users", {
 					headers: {
-					"Content-Type":'application/json'
-				}});
-				console.log(response.data);
-				setUsers(response.data);
-			} catch (err) {
-				setError("Error fetching users. Please try again later.");
-				console.log(err);
+						"Content-Type": 'application/json'
+					}
+				} );
+				console.log( response.data );
+				setUsers( response.data );
+			} catch ( err ) {
+				setError( "Error fetching users. Please try again later." );
+				console.log( err );
 			} finally {
-				setLoading(false);
+				setLoading( false );
 			}
 		};
 
 		fetchUsers();
-	}, []);
+	}, [] );
 
-	const handleVerifyToggle = async (userId: string) => {
+	const handleVerifyToggle = async ( userId: string ) => {
 		try {
-			const updatedUsers = users.map((user) =>
-				user.userID === userId ? { ...user, verified: !user.verified } : user
+			const updatedUsers = users.map( ( user ) =>
+				user._id === userId ? { ...user, verified: !user.verified } : user
 			);
-			setUsers(updatedUsers);
-			await axios.patch(`https://id-me-server.onrender.com/verified/${userId}`, {
-				verified: updatedUsers.find((user) => user.userID === userId)?.verified,
-			});
-		} catch (err) {
-			setError("Error updating user verification status. Please try again later.");
+			setUsers( updatedUsers );
+			await axios.patch( `https://id-me-server.onrender.com/verified/${ userId }`, {
+				verified: updatedUsers.find( ( user ) => user._id === userId )?.verified,
+			} );
+		} catch ( err ) {
+			console.log( err );
+			setError( "err.message" );
 		}
 	};
 
 	return (
 		<div className='bg-gray-50 w-full max-w-full p-6'>
-			<div className='text-2xl font-semibold text-gray-800 mb-6'>User Management-{users.length} </div>
-			{loading ? (
+			<div className='text-2xl font-semibold text-gray-800 mb-6'>User Management-{ users.length } </div>
+			{ loading ? (
 				<div>Loading...</div>
 			) : error ? (
-				<div>Error: {error}</div>
+				<div>Error: { error }</div>
 			) : (
 				<table className='min-w-full bg-white rounded-lg shadow-md'>
 					<thead>
@@ -76,23 +79,23 @@ const UserManagement: React.FC = () => {
 						</tr>
 					</thead>
 					<tbody className='text-gray-600 text-sm font-light'>
-						{users.map((user) => (
-							<tr key={user.userID} className='border-b border-gray-200 hover:bg-gray-100'>
-								<td className='py-3 px-6 text-left'>{`${user.firstName} ${user.lastName}`}</td>
-								<td className='py-3 px-6 text-left'>{user.citizenship}</td>
-								<td className='py-3 px-6 text-left'>{user.phoneNumber}</td>
+						{ users.map( ( user, index ) => (
+							<tr key={ index } className='border-b border-gray-200 hover:bg-gray-100'>
+								<td className='py-3 px-6 text-left'>{ `${ user.firstName } ${ user.lastName }` }</td>
+								<td className='py-3 px-6 text-left'>{ user.citizenship }</td>
+								<td className='py-3 px-6 text-left'>{ user.phoneNumber }</td>
 								<td className='py-3 px-6 text-left'>
 									<input
 										type='checkbox'
-										checked={user.verified}
-										onChange={() => handleVerifyToggle(user.userID)}
+										checked={ user.verified }
+										onChange={ () => handleVerifyToggle( user._id ) }
 									/>
 								</td>
 							</tr>
-						))}
+						) ) }
 					</tbody>
 				</table>
-			)}
+			) }
 		</div>
 	);
 };
