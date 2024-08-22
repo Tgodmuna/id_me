@@ -395,74 +395,74 @@ const Data_Inputs: React.FC = () => {
 				{/* image and video capturing */ }
 				<div className='flex w-full flex-wrap md:flex-nowrap justify-between bg-blue-100 rounded-md m-[1rem] px-[2rem]'>
 					{/* video */ }
-					{ showFaceCapture && (
-						<div className='flex flex-col items-center'>
-							<p className='text-xl capitalize mb-4'>video record</p>
-							{ !videoCameraOn && !videoSrc && !capturing && (
-								<button
-									type='button'
-									onClick={ handleStartVideoCamera }
-									className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'
-								>
-									Start Camera
-								</button>
-							) }
-							{ videoCameraOn && !videoSrc && (
-								<div>
-									<Webcam
-										audio={ true }
-										ref={ videoWebcamRef }
-										screenshotFormat='image/jpeg'
-										width='200'
-										height='150'
-										name={ "video" }
-										className='mx-auto'
-									/>
-									<div className='mt-4 flex justify-center'>
-										{ capturing ? (
-											<button
-												type='button'
-												onClick={ handleStopCaptureClick }
-												className='bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mr-2'
-											>
-												Stop Recording
-											</button>
-										) : (
-											<button
-												type='button'
-												onClick={ handleStartCaptureClick }
-												className='bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2'
-											>
-												Start Recording
-											</button>
-										) }
+
+					<div className='flex flex-col items-center'>
+						<p className='text-xl capitalize mb-4'>video record</p>
+						{ !videoCameraOn && !videoSrc && !capturing && (
+							<button
+								type='button'
+								onClick={ handleStartVideoCamera }
+								className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'
+							>
+								Start Camera
+							</button>
+						) }
+						{ videoCameraOn && !videoSrc && (
+							<div>
+								<Webcam
+									audio={ true }
+									ref={ videoWebcamRef }
+									screenshotFormat='image/jpeg'
+									width='200'
+									height='150'
+									name={ "video" }
+									className='mx-auto'
+								/>
+								<div className='mt-4 flex justify-center'>
+									{ capturing ? (
 										<button
 											type='button'
-											onClick={ handleStopVideoCamera }
-											className='bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded'
+											onClick={ handleStopCaptureClick }
+											className='bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mr-2'
 										>
-											Stop Camera
+											Stop Recording
 										</button>
-									</div>
-								</div>
-							) }
-							{ videoSrc && (
-								<div>
-									<h3 className='text-xl font-bold mb-2'>Recorded Video:</h3>
-									<video src={ videoSrc } controls className='w-80 h-60' />
-									<div className='mt-4 flex justify-center'>
+									) : (
 										<button
 											type='button'
-											onClick={ retakeVideo }
-											className='bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded mr-2'
+											onClick={ handleStartCaptureClick }
+											className='bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2'
 										>
-											Retake Video
+											Start Recording
 										</button>
-									</div>
+									) }
+									<button
+										type='button'
+										onClick={ handleStopVideoCamera }
+										className='bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded'
+									>
+										Stop Camera
+									</button>
 								</div>
-							) }
-						</div>
-					) }
+							</div>
+						) }
+						{ videoSrc && (
+							<div>
+								<h3 className='text-xl font-bold mb-2'>Recorded Video:</h3>
+								<video src={ videoSrc } controls className='w-80 h-60' />
+								<div className='mt-4 flex justify-center'>
+									<button
+										type='button'
+										onClick={ retakeVideo }
+										className='bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded mr-2'
+									>
+										Retake Video
+									</button>
+								</div>
+							</div>
+						) }
+					</div>
+
 
 					{/* image */ }
 					<div className='flex flex-col items-center h-fit mb-[1rem]'>
