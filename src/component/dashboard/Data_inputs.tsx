@@ -9,7 +9,7 @@ import LoadingSpinner from "../../hooks/useLoading";
 
 const Data_Inputs: React.FC = () => {
 	const [ citizenship, setCitizenship ] = useState( "" );
-	const [ showFaceCapture, setShowFaceCapture ] = useState( false );
+	const [, setShowFaceCapture ] = useState( false );
 	const [ showSSN, setShowSSN ] = useState( false );
 	const [ showIBAN, setShowIBAN ] = useState( false );
 	const [ phoneError, setPhoneError ] = useState<string | null>( null );
